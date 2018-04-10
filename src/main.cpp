@@ -4,14 +4,12 @@
 #include <sstream>
 #include <bitset>
 #include <cstdlib>
-//#include <random>
 #include <vector>
 #include <fstream>
 
 using namespace std;
 
 char hexDigits[] = {'1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F'};
-
 int keyShifts[] = {1, 1, 2, 2, 2, 2, 2, 2, 1, 2, 2, 2, 2, 2, 2, 1};
 
 /********************************************/
@@ -141,67 +139,25 @@ char S8[64] = {
 char* SBOXMAP[] = {S1, S2, S3, S4, S5, S6, S7, S8};
 
 int P[32] = {
-               16,   7,  20,  21,
-               29,  12,  28,  17,
-               1,  15,  23,  26,
-               5,  18,  31,  10,
-               2,   8,  24,  14,
-               32,  27,   3,   9,
-               19,  13,  30,   6,
-               22,  11,   4,  25
+	16,   7,  20,  21,
+	29,  12,  28,  17,
+	1,  15,  23,  26,
+	5,  18,  31,  10,
+	2,   8,  24,  14,
+	32,  27,   3,   9,
+	19,  13,  30,   6,
+	22,  11,   4,  25
 };
 
-//string random_string()
-//{
-//     string str("0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF");
-
-//     random_device rd;
-//     mt19937 generator(rd());
-
-//     shuffle(str.begin(), str.end(), generator);
-
-//     return str.substr(0, 16);    // assumes 32 < number of characters in str         
-//}
-
 string keyGenerator(const int len) {
-    	string s = "00000000000000000";
+	string s = "00000000000000000";
 	srand((unsigned)time(0));
-//    	static const char alphanum[] =
-//        "0123456789"
-//        "ABCDEF";
-
-    for (int i = 0; i < len; ++i) {
-        s[i] = hexDigits[rand() % (sizeof(hexDigits) - 1)];
-    }
-
-    s[len] = 0;
-
-    return s;
+	for (int i = 0; i < len; ++i) {
+		s[i] = hexDigits[rand() % (sizeof(hexDigits) - 1)];
+	}
+	s[len] = 0;
+	return s;
 }
-
-//bitset<64> stringToBinary(string a) {
-//	bitset<64> answer;
-//	bitset<8> temp;
-//	int index = 0;
-
-//	for(int i = 0; i < a.size(); i++) {
-//		temp = bitset<8>(a[i]);
-
-//		for(int j = 0; j < 8; j++) {
-//			answer[index] = temp[j];
-//			index++;
-
-//		}
-
-
-//	}
-
-////	cout << answer.to_string() << endl;
-
-//	return answer;
-
-
-//}
 
 bitset<64> stringToBinary(string a) {
 	bitset<64> answer;
@@ -210,25 +166,15 @@ bitset<64> stringToBinary(string a) {
 
 	for(int i = 0; i < a.size(); i++) {
 		temp = bitset<8>(a[i]);
-
 		for(int j = 0; j < 8; j++) {
 			answer[(64-i*8)-(8-j)] = temp[j];
 			index++;
-
 		}
-
-
 	}
-
-//	cout << answer.to_string() << endl;
-
 	return answer;
-
-
 }
 
 int calcSBoxIndex(bitset<48> b, int s) {
-
 	bitset<2> i;
 	bitset<4> j;
 
@@ -252,7 +198,6 @@ bitset<32> fillBitSet(bitset<32> initial, bitset<4> added, int s) {
 	answer[s-3] = added[0];
 
 	return answer;
-
 }
 
 bitset<64> combineBitSet(bitset<32> a, bitset<32> b) {
@@ -260,198 +205,172 @@ bitset<64> combineBitSet(bitset<32> a, bitset<32> b) {
 	int i;
 
 	for(i = 0; i < 32; i++) answer[i] = b[i];
-
 	for( ; i < 64; i++) answer[i] = a[i-32];
 
-//	cout << answer << endl;
-
 	return answer;
-
-
-
-
 }
-
-//bitset<28> circularShift(bitset<28> s, unsigned shiftBy) {
-
-//	bitset<28> answer = s << shiftBy | s >> (28-shiftBy);
-
-//	return answer;
-
-//}
 
 string pad(string a, int blockLength) {
 	string answer = "00000000";
 	int padLength = 8 - blockLength;
 
-
 	for(int i = 0; i < 8; i++) answer[i] = (char)padLength;
-
-
 	for(int i = 0; i < blockLength; i++) answer[i] = a[i];
 
-
 	return answer;
-
-
 }
 
 char next8BitsToChar(bitset<64> a, int s) {
 	bitset<8> temp;
-
-
 	for(int i = s; i < s+8; i++) temp[i-s] = a[i];
-
-//	if(s == 56) cout << "The eight bits are " << temp << endl;
-
-
 	return (char)(int)temp.to_ulong();
-
-
 }
+
+bitset<32> sBoxOutputFunc(bitset<48> er0) {
+	bitset<4> sBoxtemp;
+	bitset<32> sboxOutput;
+
+	for(int k = 0; k < 8; k++) {
+		switch(k) {
+			case 0: {
+				sBoxtemp = bitset<4>(S1[calcSBoxIndex(erO, 47-k*6)]);
+				sboxOutput = fillBitSet(sboxOutput, sBoxtemp, 31-k*4);
+				break;
+			}
+			case 1: {
+				sBoxtemp = bitset<4>(S2[calcSBoxIndex(erO, 47-k*6)]);
+				sboxOutput = fillBitSet(sboxOutput, sBoxtemp, 31-k*4);
+				break;
+			}
+			case 2: {
+				sBoxtemp = bitset<4>(S3[calcSBoxIndex(erO, 47-k*6)]);
+				sboxOutput = fillBitSet(sboxOutput, sBoxtemp, 31-k*4);
+				break;
+			}
+			case 3: {
+				sBoxtemp = bitset<4>(S4[calcSBoxIndex(erO, 47-k*6)]);
+				sboxOutput = fillBitSet(sboxOutput, sBoxtemp, 31-k*4);
+				break;
+			}
+			case 4: {
+				sBoxtemp = bitset<4>(S5[calcSBoxIndex(erO, 47-k*6)]);
+				sboxOutput = fillBitSet(sboxOutput, sBoxtemp, 31-k*4);
+				break;
+			}
+			case 5: {
+				sBoxtemp = bitset<4>(S6[calcSBoxIndex(erO, 47-k*6)]);
+				sboxOutput = fillBitSet(sboxOutput, sBoxtemp, 31-k*4);
+				break;
+			}
+			case 6: {
+				sBoxtemp = bitset<4>(S7[calcSBoxIndex(erO, 47-k*6)]);
+				sboxOutput = fillBitSet(sboxOutput, sBoxtemp, 31-k*4);
+				break;
+			}
+			case 7: {
+				sBoxtemp = bitset<4>(S8[calcSBoxIndex(erO, 47-k*6)]);
+				sboxOutput = fillBitSet(sboxOutput, sBoxtemp, 31-k*4);
+				break;
+			}
+			default: cout << "Something went wrong" << endl;
+		}
+	}
+	return sboxOutput;
+}
+
 
 int main(){
 
-//key scheduling
-
+	//key scheduling
 	string key, IV;
 
-//**************uncomment****************
-
+	//**************uncomment****************
 	while(key.length() != 16) {
-	cout << "Please enter your key or enter -1 for a key to be generated" << endl;
+		cout << "Please enter your key or enter -1 for a key to be generated" << endl;
+		cin >> key;
 
-	cin >> key;
-
-	if(!key.compare("-1")) { 
-
-		cout << endl;
-
-		key = keyGenerator(16);
-
-		break;
-
-	}
-
-	if(key.length() != 16) cout << "Your key is not the correct number of bits" << " it is " << key.length()*4 << " bits" << endl;
-
-	if(key.length() == 16) {
-		if(key.find_first_not_of("abcdefABCDEF0123456789") != string::npos) {
-			cout << "The key contains invalid characters. Please enter only hexadecimal digits" << endl;
-			key = "";
-			continue;
+		if(!key.compare("-1")) {
+			cout << endl;
+			key = keyGenerator(16);
+			break;
 		}
 
-	}
-	
-	}
-//**************uncomment****************
+		if(key.length() != 16) cout << "Your key is not the correct number of bits" << " it is " << key.length()*4 << " bits" << endl;
 
+		if(key.length() == 16) {
+			if(key.find_first_not_of("abcdefABCDEF0123456789") != string::npos) {
+				cout << "The key contains invalid characters. Please enter only hexadecimal digits" << endl;
+				key = "";
+				continue;
+			}
+		}
+	}
+
+	//**************uncomment****************
 	while(IV.length() != 16) {
-	cout << "Please enter your IV or enter -1 for an IV to be generated" << endl;
-
-	cin >> IV;
-
-	if(!IV.compare("-1")) { 
-
-		cout << endl;
-
-		IV = keyGenerator(16);
-
-		break;
-
-	}
-
-	if(IV.length() != 16) cout << "Your IV is not the correct number of bits" << " it is " << key.length()*4 << " bits" << endl;
-
-	if(IV.length() == 16) {
-		if(IV.find_first_not_of("abcdefABCDEF0123456789") != string::npos) {
-			cout << "The IV contains invalid characters. Please enter only hexadecimal digits" << endl;
-			IV = "";
-			continue;
+		cout << "Please enter your IV or enter -1 for an IV to be generated" << endl;
+		cin >> IV;
+		if(!IV.compare("-1")) {
+			cout << endl;
+			IV = keyGenerator(16);
+			break;
 		}
 
+		if(IV.length() != 16) cout << "Your IV is not the correct number of bits" << " it is " << key.length()*4 << " bits" << endl;
+
+		if(IV.length() == 16) {
+			if(IV.find_first_not_of("abcdefABCDEF0123456789") != string::npos) {
+				cout << "The IV contains invalid characters. Please enter only hexadecimal digits" << endl;
+				IV = "";
+				continue;
+			}
+		}
 	}
-	
-	}
-//comment
-//	key = "133457799BBCDFF1";
-//comment
+
+	//comment
+	//	key = "133457799BBCDFF1";
+	//comment
 
 	int mode = -1, modeTemp;
 	string modeString;
 
-	while(mode != 1 && mode != 2){
-
+	while(mode != 1 && mode != 2) {
 		cout << "Select mode. Enter 1 for encryption or 2 for decryption" << endl;
-
-
 		cin >> modeString;
-
 		stringstream modeConvert(modeString);
-
 		modeConvert >> modeTemp;
-
 		cout << modeTemp << endl;
 
-
 		if(modeTemp != 1 && modeTemp != 2) cout << "That is not a valid entry." << endl;
-
 		else mode = modeTemp;
-
-
-
 	}
 
 	char outputFileName[1000];
-
 	cout << "Please enter the name of the output file" << endl;
-
-
 	cin >> outputFileName;
 
-	
-
 	cout << "Your key is " << key << endl;
-
 	cout << "Your IV is " << IV << endl;
 
 	if(mode == 1) cout << "You are encrypting" << endl;
-
 	else cout << "You are decrypting" << endl;
 
 	stringstream ss;
-
 	ss << hex << key;
 
 	unsigned long long n;
 
 	ss >> n;
-
 	bitset<64> b(n);
 
-//	cout << "In binary: " << b << endl;
-
-//	cout << "Bit 67 is " << b[67] << endl;
-
 	bitset<56> kPlus;
-	
 
-	for(int i = 56; i > 0; i--){
+	for(int i = 56; i > 0; i--) {
 		kPlus[i-1] = b[64-PC1[56-i]];
-
-//		if(PC1[56-i] == 33) cout << "The bit is " << b[64-PC1[56-i]] << endl;
-
 	}
 
-
-//	cout << "K+ = " << kPlus.to_string() << endl;
-
-//split key
+	//split key
 	bitset<56> andSet (0b00000000000000000000000000001111111111111111111111111111);
-	
-//	bitset<28> c0;
-//	bitset<28> d0;
 
 	bitset<28> cshifts[17];
 	bitset<28> dshifts[17];
@@ -461,90 +380,48 @@ int main(){
 	cshifts[0] = bitset<28> (((kPlus >> 28) & andSet).to_ulong());
 	dshifts[0] = bitset<28> ((kPlus & andSet).to_ulong());
 
-//end of split key?
+	//end of split key?
 
-//	cout << "c0 = " << cshifts[0].to_string() << endl;
-//	cout << "d0 = " << dshifts[0].to_string() << endl;
-
-
-	for(int i = 1; i < 17; i++){
+	for(int i = 1; i < 17; i++) {
 		cshifts[i] = (cshifts[i-1] << keyShifts[i-1] | cshifts[i-1] >> (28-keyShifts[i-1]));
 		dshifts[i] = (dshifts[i-1] << keyShifts[i-1] | dshifts[i-1] >> (28-keyShifts[i-1]));
-
 	}
 
-//	cout << "c1 = " << cshifts[1].to_string() << endl;
-//	cout << "d1 = " << dshifts[1].to_string() << endl;
-
-//	cout << "The key schedule is as follows: " << endl;
-
-	for(int i = 0; i < 16; i++){
-
+	for(int i = 0; i < 16; i++) {
 		for(int j = 48; j > 0; j--) {
-
 			if(PC2[48-j] < 29) keySchedule[i][j-1] = cshifts[i+1][28-PC2[48-j]];
-
 			else keySchedule[i][j-1] = dshifts[i+1][28-(PC2[48-j]-28)];
-
-
 		}
-
-//		cout << "k" << i+1 << " = " << keySchedule[i].to_string() << endl;
-
 	}
+	//end of key schedule
 
-//	cout << "k1 = " << keySchedule[0].to_string() << endl;
-
-//end of key schedule
-
-//read file
-
+	//read file
 	char inputFile[1000];
-//***************************uncomment*********
+	//***************************uncomment*********
 	if(mode == 1) cout << "Please enter the file path for file to be encrypted." << endl;
-
 	else cout << "Please enter the file path for file to be decrypted." << endl;
 
 	cin >> inputFile;
-//***************************uncomment*********
+	//***************************uncomment*********
 
 	char c;
-
 	string temp = "00000000";
 
 	int i = 0, j = 0;
-
 	vector<string> inputFileBlocks;
 
-	
-
-//	fstream f(inputFile, fstream::in);
-
-//***********uncomment*************
+	//***********uncomment*************
 	ifstream inF(inputFile);
-//***********uncomment*************
+	//***********uncomment*************
 
-//comment
-//	ifstream inF("textfile.txt");
-//comment
-
-//output file initialization
+	//output file initialization
 	ofstream outputFile;
-
 	outputFile.open(outputFileName);
-
-//	if(mode == 1)  outputFile.open("encryptedfile");
-
-//	else outputFile.open("decryptedfile");
-
-//end of output file initialization
-
-//	while(f >> noskipws >> c) {
 
 	while(inF.get(c)) {
 		temp[i] = c;
 		i++;
-		if(i == 8){
+		if(i == 8) {
 			inputFileBlocks.push_back(temp);
 			temp = "00000000";
 			i = 0;
@@ -552,286 +429,112 @@ int main(){
 	}
 
 	inF.close();
+	//end of read file
 
 	if(temp.compare("00000000")) inputFileBlocks.push_back(pad(temp, i));
 
-//end of read file
-
-//	stringstream convertstream;
-
-//	unsigned long long n1;
-
-//convert blocks into binary
-
+	//convert blocks into binary
 	int j1 = 0;
-
 	bitset<64> inputFileBlocksBinary[inputFileBlocks.size()];
-
 	bitset<8> blockToBits;
-
-	
-
-//	for(vector <string> :: iterator i = plaintextBlocks.begin(); i != plaintextBlocks.end(); ++i){
 
 	for(int i = 0; i < inputFileBlocks.size(); i++) {
 
-//		cout << plaintextBlocks[i] << endl;
-
-//		convertstream << hex << *i;
-
-//		convertstream >> n1;
-		
-//		bitset<64> b(plaintextBlocks[i]);
-
 		inputFileBlocksBinary[j1] = stringToBinary(inputFileBlocks[i]);
-
-//		plaintextBlocksBinary[j1] = bitset<64>(plaintextBlocks[i]);
-
-//		cout << plaintextBlocksBinary[j1].to_string() << endl;
-
 		j1++;
-
-
 	}
-
-//	cout << "This is the first block " << plaintextBlocksBinary[0] << endl;
-
-//end of block to binary
-
-//temp check stuff
-
-//string mess = "0123456789ABCDEF";
-
-//	stringstream convertstream;
-
-//	convertstream << hex << mess;
-
-//	unsigned long long n1;
-
-//	convertstream >> n1;
-//	cout << "First binary is " << plaintextBlocksBinary[0] << endl;
-//	plaintextBlocksBinary[0] = bitset<64>(n1);
-
-//	cout << "Now it is " << plaintextBlocksBinary[0] << endl;
-
-//end of temp check
-// CBC requires XORing plaintext with old cipher block
-
+	//end of block to binary
+	//
+	// CBC requires XORing plaintext with old cipher block
 	stringstream IVconvertstream;
-
 	IVconvertstream << hex << IV;
-
 	unsigned long long IVn;
-
 	IVconvertstream >> IVn;
 
 	bitset<64> ciMinusOne(IVn);
+	cout << "The IV in binary is " << ciMinusOne << endl;
+	//end of setting old cipher block
 
-cout << "The IV in binary is " << ciMinusOne << endl;
+	//go through blocks
+	for(int i = 0; i < inputFileBlocks.size(); i++) {
+		bitset<64> currentBlock;
+		//applying CBC mode condition if encrypting
+		if(mode == 1) currentBlock = (inputFileBlocksBinary[i]^=ciMinusOne);
+		//end of CBC mode condition if encrypting
+		else currentBlock = inputFileBlocksBinary[i];
 
-//end of setting old cipher block
+		//initial permuation
+		bitset<64> initialPerm;
 
-//go through blocks
-for(int i = 0; i < inputFileBlocks.size(); i++) {
-
-	bitset<64> currentBlock;
-
-//applying CBC mode condition if encrypting
-	if(mode == 1) currentBlock = (inputFileBlocksBinary[i]^=ciMinusOne);
-//end of CBC mode condition if encrypting
-
-	else currentBlock = inputFileBlocksBinary[i];
-
-//initial permuation 
-	bitset<64> initialPerm;
-
-
-	for(int j = 0; j < 64; j++) {
-		initialPerm[63-j] = currentBlock[64-IP[j]];  
-//select each block
-		
-//		initialPerm[63-j] = plaintextBlocksBinary[0][64-IP[j]];
-
-
-	}
-
-//	cout << "Initial Perm is  " << initialPerm << endl;
-//end of initial permutation
-
-	bitset<64> andSet1 (0b0000000000000000000000000000000011111111111111111111111111111111);
-
-	bitset<32> lO = bitset<32> (((initialPerm >> 32) & andSet1).to_ulong());
-	bitset<32> rO = bitset<32> ((initialPerm & andSet1).to_ulong());
-
-//	cout << "L0 = " << l0 << endl;
-
-//	cout << "R0 = " << r0 << endl;
-
-	bitset<32> lN;
-	bitset<32> rN;
-
-	bitset<48> erO;
-
-
-//rounds
-	for(int j = 0; j < 16; j++) {
-		lN = rO;
-
-		rN= lO;
-//expansion of rOld
-
-		for(int k = 0; k < 48; k++) erO[47-k] = rO[32-E[k]];
-
-//	cout << "E(R0) = " << erO << endl;
-
-//end of expansion
-
-//XOR with key
-
-	if(mode == 1) erO = (erO^=keySchedule[j]);
-
-	else erO = (erO^=keySchedule[15-j]);
-
-//	cout << "E(R0) = " << erO << endl;
-
-//end of XOR
-
-// S boxes
-	
-//	cout << bitset<4>(S1[2]) << endl;
-
-	bitset<32> sboxOutput;
-
-	bitset<4> sBoxtemp;
-
-	for(int k = 0; k < 8; k++) {
-		switch(k) {
-			case 0: {
-				sBoxtemp = bitset<4>(S1[calcSBoxIndex(erO, 47-k*6)]);
-//				cout << (int)calcSBoxIndex(erO, 47-k*6) << endl;
-				sboxOutput = fillBitSet(sboxOutput, sBoxtemp, 31-k*4);
-
-//				cout << sboxOutput << endl;
-				break;
-
-			}
-			case 1: {
-				sBoxtemp = bitset<4>(S2[calcSBoxIndex(erO, 47-k*6)]);
-//				cout << (int)calcSBoxIndex(erO, 47-k*6) << endl;
-				sboxOutput = fillBitSet(sboxOutput, sBoxtemp, 31-k*4);
-
-				break;
-
-			}
-			case 2: {
-				sBoxtemp = bitset<4>(S3[calcSBoxIndex(erO, 47-k*6)]);
-				sboxOutput = fillBitSet(sboxOutput, sBoxtemp, 31-k*4);
-				break;
-
-			}
-			case 3: {
-				sBoxtemp = bitset<4>(S4[calcSBoxIndex(erO, 47-k*6)]);
-				sboxOutput = fillBitSet(sboxOutput, sBoxtemp, 31-k*4);
-				break;
-
-			}
-			case 4: {
-				sBoxtemp = bitset<4>(S5[calcSBoxIndex(erO, 47-k*6)]);
-				sboxOutput = fillBitSet(sboxOutput, sBoxtemp, 31-k*4);
-				break;
-
-			}
-			case 5: {
-				sBoxtemp = bitset<4>(S6[calcSBoxIndex(erO, 47-k*6)]);
-				sboxOutput = fillBitSet(sboxOutput, sBoxtemp, 31-k*4);
-				break;
-
-			}
-			case 6: {
-				sBoxtemp = bitset<4>(S7[calcSBoxIndex(erO, 47-k*6)]);
-				sboxOutput = fillBitSet(sboxOutput, sBoxtemp, 31-k*4);
-				break;
-
-			}
-			case 7: {
-				sBoxtemp = bitset<4>(S8[calcSBoxIndex(erO, 47-k*6)]);
-				sboxOutput = fillBitSet(sboxOutput, sBoxtemp, 31-k*4);
-//				cout << sboxOutput << endl;
-				break;
-
-			}
-			default: cout << "Something went wrong" << endl;
-
-
+		for(int j = 0; j < 64; j++) {
+			initialPerm[63-j] = currentBlock[64-IP[j]];
 		}
+		//end of initial permutation
 
+		bitset<64> andSet1 (0b0000000000000000000000000000000011111111111111111111111111111111);
+
+		bitset<32> lO = bitset<32> (((initialPerm >> 32) & andSet1).to_ulong());
+		bitset<32> rO = bitset<32> ((initialPerm & andSet1).to_ulong());
+
+		bitset<32> lN;
+		bitset<32> rN;
+
+		bitset<48> erO;
+
+		//rounds
+		for(int j = 0; j < 16; j++) {
+			lN = rO;
+			rN= lO;
+			//expansion of rOld
+
+			for(int k = 0; k < 48; k++) erO[47-k] = rO[32-E[k]];
+			//end of expansion
+
+			//XOR with key
+			if(mode == 1) erO = (erO^=keySchedule[j]);
+			else erO = (erO^=keySchedule[15-j]);
+			//end of XOR
+
+			// S boxes
+			bitset<32> sboxOutput = sBoxOutputFunc(er0);
+			// end of S boxes
+
+			//permuation of output of s boxes
+			bitset<32> pOS;
+			for(int k = 0; k < 32; k++) pOS[31-k] = sboxOutput[32-P[k]];
+			//end of permutation of output of s boxes
+
+			//find rN
+			rN = (lO^=pOS);
+			//end of rN
+
+			lO = lN;
+			rO = rN;
+		}
+		//end of rounds
+
+		//after rounds combine and apply final permuation
+		bitset<64> R16L16;
+		bitset<64> R16L16FP;
+
+		R16L16 = combineBitSet(rN, lN);
+
+		//final permutation
+		for(int k = 0; k < 64; k++) R16L16FP[63-k] = R16L16[64-FP[k]];
+
+		if(mode == 2) {
+			R16L16FP = (R16L16FP^=ciMinusOne);
+			ciMinusOne = currentBlock;
+		}	else ciMinusOne = R16L16FP;
+
+		cout << R16L16FP << endl;
+
+		for(int k = 7; k >= 0; k--) {
+			outputFile << next8BitsToChar(R16L16FP, 8*k);
+		}
+		//end of permutation
 	}
-
-
-// end of S boxes
-//permuation of output of s boxes
-	bitset<32> pOS;
-
-	for(int k = 0; k < 32; k++) pOS[31-k] = sboxOutput[32-P[k]];
-
-
-//	cout << pOS << endl;
-//end of permutation of output of s boxes
-
-//find rN
-
-rN = (lO^=pOS);
-
-//cout << rN << endl;
-//end of rN
-
-	lO = lN;
-	rO = rN;
-		
-
-
-	}
-//end of rounds
-
-//after rounds combine and apply final permuation
-
-bitset<64> R16L16;
-
-bitset<64> R16L16FP;
-
-
-
-R16L16 = combineBitSet(rN, lN);
-
-//final permutation
-
-for(int k = 0; k < 64; k++) R16L16FP[63-k] = R16L16[64-FP[k]];
-
-if(mode == 2) {
-
-	R16L16FP = (R16L16FP^=ciMinusOne);
-
-	ciMinusOne = currentBlock;
-
-}
-
-else ciMinusOne = R16L16FP;
-
-cout << R16L16FP << endl;
-
-for(int k = 7; k >= 0; k--) {
-
-	outputFile << next8BitsToChar(R16L16FP, 8*k);
-
-}
-
-//end of permutation
-
-//resetting ciMinusOne
-
-} 
-//end of outer loop for blocks
-
+	//end of outer loop for blocks
 	outputFile.close();
 	return 0;
 }
