@@ -179,20 +179,6 @@ string keyGenerator(const int len) {
     return s;
 }
 
-string pad(string a, int blockLength) {
-	string answer = "00000000";
-	int padLength = 8 - blockLength;
-
-	for(int i = 0; i < 8; i++) answer[i] = (char)padLength;
-
-	cout << answer << endl;
-
-	for(int i = 0; i <= blockLength;  i++) answer[i] = a[i];
-
-	return answer;	
-
-}
-
 //bitset<64> stringToBinary(string a) {
 //	bitset<64> answer;
 //	bitset<8> temp;
@@ -256,7 +242,7 @@ int calcSBoxIndex(bitset<48> b, int s) {
 
 	return (16 * (int)i.to_ulong() + (int)j.to_ulong());
 }
-// find total output of s boxes from output of each s box
+
 bitset<32> fillBitSet(bitset<32> initial, bitset<4> added, int s) {
 	bitset<32> answer = initial;
 
@@ -293,6 +279,36 @@ bitset<64> combineBitSet(bitset<32> a, bitset<32> b) {
 //	return answer;
 
 //}
+
+string pad(string a, int blockLength) {
+	string answer = "00000000";
+	int padLength = 8 - blockLength;
+
+
+	for(int i = 0; i < 8; i++) answer[i] = (char)padLength;
+
+
+	for(int i = 0; i < blockLength; i++) answer[i] = a[i];
+
+
+	return answer;
+
+
+}
+
+char next8BitsToChar(bitset<64> a, int s) {
+	bitset<8> temp;
+
+
+	for(int i = s; i < s+8; i++) temp[i-s] = a[i];
+
+//	if(s == 56) cout << "The eight bits are " << temp << endl;
+
+
+	return (char)(int)temp.to_ulong();
+
+
+}
 
 int main(){
 
@@ -362,9 +378,47 @@ int main(){
 //	key = "133457799BBCDFF1";
 //comment
 
+	int mode = -1, modeTemp;
+	string modeString;
+
+	while(mode != 1 && mode != 2){
+
+		cout << "Select mode. Enter 1 for encryption or 2 for decryption" << endl;
+
+
+		cin >> modeString;
+
+		stringstream modeConvert(modeString);
+
+		modeConvert >> modeTemp;
+
+		cout << modeTemp << endl;
+
+
+		if(modeTemp != 1 && modeTemp != 2) cout << "That is not a valid entry." << endl;
+
+		else mode = modeTemp;
+
+
+
+	}
+
+	char outputFileName[1000];
+
+	cout << "Please enter the name of the output file" << endl;
+
+
+	cin >> outputFileName;
+
+	
+
 	cout << "Your key is " << key << endl;
 
 	cout << "Your IV is " << IV << endl;
+
+	if(mode == 1) cout << "You are encrypting" << endl;
+
+	else cout << "You are decrypting" << endl;
 
 	stringstream ss;
 
@@ -379,7 +433,6 @@ int main(){
 //	cout << "In binary: " << b << endl;
 
 //	cout << "Bit 67 is " << b[67] << endl;
-
 
 	bitset<56> kPlus;
 	
@@ -448,7 +501,9 @@ int main(){
 
 	char inputFile[1000];
 //***************************uncomment*********
-	cout << "Please enter the file path for file to be encrypted." << endl;
+	if(mode == 1) cout << "Please enter the file path for file to be encrypted." << endl;
+
+	else cout << "Please enter the file path for file to be decrypted." << endl;
 
 	cin >> inputFile;
 //***************************uncomment*********
@@ -459,7 +514,9 @@ int main(){
 
 	int i = 0, j = 0;
 
-	vector<string> plaintextBlocks;
+	vector<string> inputFileBlocks;
+
+	
 
 //	fstream f(inputFile, fstream::in);
 
@@ -471,13 +528,24 @@ int main(){
 //	ifstream inF("textfile.txt");
 //comment
 
+//output file initialization
+	ofstream outputFile;
+
+	outputFile.open(outputFileName);
+
+//	if(mode == 1)  outputFile.open("encryptedfile");
+
+//	else outputFile.open("decryptedfile");
+
+//end of output file initialization
+
 //	while(f >> noskipws >> c) {
 
 	while(inF.get(c)) {
 		temp[i] = c;
 		i++;
 		if(i == 8){
-			plaintextBlocks.push_back(temp);
+			inputFileBlocks.push_back(temp);
 			temp = "00000000";
 			i = 0;
 		}
@@ -485,7 +553,7 @@ int main(){
 
 	inF.close();
 
-	if(temp.compare("00000000")) plaintextBlocks.push_back(pad(temp, i));
+	if(temp.compare("00000000")) inputFileBlocks.push_back(pad(temp, i));
 
 //end of read file
 
@@ -497,7 +565,7 @@ int main(){
 
 	int j1 = 0;
 
-	bitset<64> plaintextBlocksBinary[plaintextBlocks.size()];
+	bitset<64> inputFileBlocksBinary[inputFileBlocks.size()];
 
 	bitset<8> blockToBits;
 
@@ -505,7 +573,9 @@ int main(){
 
 //	for(vector <string> :: iterator i = plaintextBlocks.begin(); i != plaintextBlocks.end(); ++i){
 
-	for(int i = 0; i < plaintextBlocks.size(); i++) {
+	for(int i = 0; i < inputFileBlocks.size(); i++) {
+
+//		cout << plaintextBlocks[i] << endl;
 
 //		convertstream << hex << *i;
 
@@ -513,7 +583,7 @@ int main(){
 		
 //		bitset<64> b(plaintextBlocks[i]);
 
-		plaintextBlocksBinary[j1] = stringToBinary(plaintextBlocks[i]);
+		inputFileBlocksBinary[j1] = stringToBinary(inputFileBlocks[i]);
 
 //		plaintextBlocksBinary[j1] = bitset<64>(plaintextBlocks[i]);
 
@@ -562,11 +632,15 @@ cout << "The IV in binary is " << ciMinusOne << endl;
 //end of setting old cipher block
 
 //go through blocks
-for(int i = 0; i < plaintextBlocks.size(); i++) {
+for(int i = 0; i < inputFileBlocks.size(); i++) {
 
-//applying CBC mode condition
-	bitset<64> currentBlock = (plaintextBlocksBinary[i]^=ciMinusOne);
-//end of CBC mode condition
+	bitset<64> currentBlock;
+
+//applying CBC mode condition if encrypting
+	if(mode == 1) currentBlock = (inputFileBlocksBinary[i]^=ciMinusOne);
+//end of CBC mode condition if encrypting
+
+	else currentBlock = inputFileBlocksBinary[i];
 
 //initial permuation 
 	bitset<64> initialPerm;
@@ -614,7 +688,9 @@ for(int i = 0; i < plaintextBlocks.size(); i++) {
 
 //XOR with key
 
-	erO = (erO^=keySchedule[j]);
+	if(mode == 1) erO = (erO^=keySchedule[j]);
+
+	else erO = (erO^=keySchedule[15-j]);
 
 //	cout << "E(R0) = " << erO << endl;
 
@@ -731,15 +807,31 @@ R16L16 = combineBitSet(rN, lN);
 
 for(int k = 0; k < 64; k++) R16L16FP[63-k] = R16L16[64-FP[k]];
 
+if(mode == 2) {
+
+	R16L16FP = (R16L16FP^=ciMinusOne);
+
+	ciMinusOne = currentBlock;
+
+}
+
+else ciMinusOne = R16L16FP;
+
 cout << R16L16FP << endl;
+
+for(int k = 7; k >= 0; k--) {
+
+	outputFile << next8BitsToChar(R16L16FP, 8*k);
+
+}
 
 //end of permutation
 
 //resetting ciMinusOne
 
-ciMinusOne = R16L16FP;
-
 } 
 //end of outer loop for blocks
+
+	outputFile.close();
 	return 0;
 }
