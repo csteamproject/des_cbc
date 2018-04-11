@@ -1,0 +1,37 @@
+----
+USE
+----
+
+To use this program simply run the "sh makeall.sh" command which should both compile and run the program.
+Alternatively, you can run the "make all" command and then run the executable that is produced with "./main"
+
+
+1. The use of this program allows the user to enter a specific key (16 hexadecimal digits) or one can be
+generated.
+
+To do this the program will prompt you to either enter the key or enter -1 for a random key to be generated.
+
+2. The program similarly allows for user inputted IV or generation of one.
+
+Again a prompt will ask you to enter an IV (16 hexadecimal digits) or enter -1 for a random IV to be generated.
+
+3. The program also asks for a filename for the output file (encryption or decryption)
+
+The program will prompt you to enter a file name.
+
+4. To select between encryption and decryption, enter either 1 for encryption or 2 for decryption.
+
+5. To select file to be used as input, enter the filename if the file is in the correct directory or
+enter the filepath.
+
+Output is printed both in the console and the file that the user has specified.
+
+
+-----------
+REFERENCES
+-----------
+
+ Grabbe, J Orlin. “The DES Algorithm Illustrated.” The DES Algorithm Ilustrated, Tu-Berlin, page.math.tu-berlin.de/~kant/teaching/hess/krypto-ws2006/des.htm.
+
+
+Ireland, D. (2017, August 08). Padding schemes for block ciphers. Retrieved April 11, 2018, from https://www.cryptosys.net/pki/manpki/pki_paddingschemes.html
