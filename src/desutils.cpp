@@ -144,6 +144,10 @@ int P[32] = {
 	22,  11,   4,  25
 };
 
+// Function that generates a random hexadecimal string
+// of 16 characters
+// Used to generate ivs or keys if necessary
+
 string desutils::keyGenerator(const int len) {
 	string s = "00000000000000000";
 	srand((unsigned)time(0));
@@ -154,6 +158,8 @@ string desutils::keyGenerator(const int len) {
 	return s;
 }
 
+// Function that converts a string of 8 characters to binary
+// Used to convert input blocks to binary
 bitset<64> desutils::stringToBinary(string a) {
 	bitset<64> answer;
 	bitset<8> temp;
@@ -169,6 +175,8 @@ bitset<64> desutils::stringToBinary(string a) {
 	return answer;
 }
 
+// Function used to calculate the index of an S box
+// using the 6 bit addressing used for DES
 int desutils::calcSBoxIndex(bitset<48> b, int s) {
 	bitset<2> i;
 	bitset<4> j;
@@ -184,6 +192,9 @@ int desutils::calcSBoxIndex(bitset<48> b, int s) {
 	return (16 * (int)i.to_ulong() + (int)j.to_ulong());
 }
 
+// Function to form S box output
+// Each S box output of 4 bits is added to bigger bitset
+// holding the total of the S box output
 bitset<32> desutils::fillBitSet(bitset<32> initial, bitset<4> added, int s) {
 	bitset<32> answer = initial;
 
@@ -195,6 +206,11 @@ bitset<32> desutils::fillBitSet(bitset<32> initial, bitset<4> added, int s) {
 	return answer;
 }
 
+// Function that combines two 32 bit bitsets into a
+// 64 bit bitset
+// Used for the combining of the right half and 
+// left half of the block after the rounds have been
+// completed
 bitset<64> desutils::combineBitSet(bitset<32> a, bitset<32> b) {
 	bitset<64> answer;
 	int i;
@@ -205,6 +221,9 @@ bitset<64> desutils::combineBitSet(bitset<32> a, bitset<32> b) {
 	return answer;
 }
 
+// Function that pads the last block of input
+// to fill 64 bits
+// Conforms with openssl default for padding
 string desutils::pad(string a, int blockLength) {
 	string answer = "00000000";
 	int padLength = 8 - blockLength;
@@ -215,12 +234,18 @@ string desutils::pad(string a, int blockLength) {
 	return answer;
 }
 
+// Function used to convert 8 bits of the 64 bit bitset
+// to a character so that it can be written to a file
 char desutils::next8BitsToChar(bitset<64> a, int s, int ofs) {
 	bitset<8> temp;
 	for(int i = s; i < s+(8-ofs); i++) temp[i-s] = a[i];
 	return (char)(int)temp.to_ulong();
 }
 
+// Function that takes input of a 16 character
+// hexadecimal string
+// Used to take input from user for both
+// key and IV
 string desutils::getHexStringInput(string keyOrIV) {
 	string answer;
 
@@ -247,6 +272,9 @@ string desutils::getHexStringInput(string keyOrIV) {
 	return answer;
 }
 
+// Function that takes input of an integer
+// to determine whether the user intends
+// to encrypt or decrypt
 int desutils::getMode() {
 	int mode = -1, modeTemp;
 	string modeString;
@@ -264,6 +292,8 @@ int desutils::getMode() {
 	return mode;
 }
 
+// Function that takes a string of hexadecimal digits
+// and converts it to a 64 bit bitset
 bitset<64> desutils::hexStringToBinary64(string hString) {
 	stringstream convertStream;
 	convertStream << hex << hString;
@@ -273,7 +303,7 @@ bitset<64> desutils::hexStringToBinary64(string hString) {
 	return bitset<64>(n);
 }
 
-
+// Function that produces the output of the S boxes
 bitset<32> desutils::sBoxOutputFunc(bitset<48> erO) {
 	bitset<4> sBoxtemp;
 	bitset<32> sboxOutput;
@@ -284,6 +314,8 @@ bitset<32> desutils::sBoxOutputFunc(bitset<48> erO) {
 	}
 }
 
+// Function that produces the key schedule using the key in binary form as
+// input
 void desutils::keyScheduleGenerator(bitset<64> keyBin) {
 	bitset<56> kPlus;
 	bitset<56> andSet (0b00000000000000000000000000001111111111111111111111111111);
@@ -314,6 +346,8 @@ void desutils::keyScheduleGenerator(bitset<64> keyBin) {
 	//end of key schedule
 }
 
+// Function that reads from file and outputs a vector of strings
+// which represent the blocks for DES
 vector<string> desutils::inputFileReader(char inputFile[1000]) {
 	char c;
 	string temp = "00000000";
@@ -321,9 +355,7 @@ vector<string> desutils::inputFileReader(char inputFile[1000]) {
 	int i = 0, j = 0;
 	vector<string> inputFileBlocks;
 
-	//***********uncomment*************
 	ifstream inF(inputFile);
-	//***********uncomment*************
 
 	while(inF.get(c)) {
 		temp[i] = c;
@@ -342,6 +374,9 @@ vector<string> desutils::inputFileReader(char inputFile[1000]) {
 	return inputFileBlocks;
 }
 
+// Function that implements the DES algorithm in CBC mode
+// Depending on the mode selected, this function either decrypts
+// or encrypts using DES in CBC mode
 void desutils::des(char outputFileName[1000], bitset<64> inputFileBlocksBinary[], int mode, bitset<64> ciMinusOne, int blockNumber) {
 
 	ofstream outputFile;

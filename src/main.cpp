@@ -1,23 +1,22 @@
-//Needs to be cleaned up
-
+// Robert Dale & Alexander Kurian
+// CS 478
 
 #include "desutils.h"
 
 using namespace std;
 
 int main(){
-
-	//key scheduling
+	//variables
 	string key, IV;
 	desutils d;
 	int mode;
 	char outputFileName[1000];
 
+	//user inputs
 	key = d.getHexStringInput("key");
 	IV = d.getHexStringInput("IV");
 
 	mode = d.getMode();
-
 	cout << "Please enter the name of the output file" << endl;
 	cin >> outputFileName;
 
@@ -32,7 +31,6 @@ int main(){
 
 	//read file
 	char inputFile[1000];
-	//***************************uncomment*********
 	if(mode == 1) cout << "Please enter the file path for file to be encrypted." << endl;
 	else cout << "Please enter the file path for file to be decrypted." << endl;
 
@@ -40,6 +38,7 @@ int main(){
 
 	vector<string> inputFileBlocks = d.inputFileReader(inputFile);
 
+	//convert input blocks into binary
 	int j1 = 0;
 	bitset<64> inputFileBlocksBinary[inputFileBlocks.size()];
 	bitset<8> blockToBits;
@@ -48,12 +47,13 @@ int main(){
 		inputFileBlocksBinary[j1] = d.stringToBinary(inputFileBlocks[i]);
 		j1++;
 	}
-	//end of block to binary
+	//end of conversion 
 
 	// CBC requires XORing plaintext with old cipher block
 	bitset<64> ciMinusOne(d.hexStringToBinary64(IV));
-	cout << "The IV in binary is " << ciMinusOne << endl;
 	//end of setting old cipher block
+	
+	//calling of des function
 	d.des(outputFileName, inputFileBlocksBinary, mode, ciMinusOne, inputFileBlocks.size());
 	return 0;
 }
