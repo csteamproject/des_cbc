@@ -11,6 +11,8 @@ using namespace std;
 
 char hexDigits[] = {'1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F'};
 int keyShifts[] = {1, 1, 2, 2, 2, 2, 2, 2, 1, 2, 2, 2, 2, 2, 2, 1};
+bitset<48> keySchedule[16];
+//vector<string> inputFileBlocks;
 
 /********************************************/
 /* Tables for initial and final permutation */
@@ -220,117 +222,45 @@ string pad(string a, int blockLength) {
 	return answer;
 }
 
-char next8BitsToChar(bitset<64> a, int s) {
+char next8BitsToChar(bitset<64> a, int s, int ofs) {
 	bitset<8> temp;
-	for(int i = s; i < s+8; i++) temp[i-s] = a[i];
+	for(int i = s; i < s+(8-ofs); i++) temp[i-s] = a[i];
 	return (char)(int)temp.to_ulong();
 }
 
-bitset<32> sBoxOutputFunc(bitset<48> er0) {
-	bitset<4> sBoxtemp;
-	bitset<32> sboxOutput;
+string getHexStringInput(string keyOrIV){
 
-	for(int k = 0; k < 8; k++) {
-		switch(k) {
-			case 0: {
-				sBoxtemp = bitset<4>(S1[calcSBoxIndex(erO, 47-k*6)]);
-				sboxOutput = fillBitSet(sboxOutput, sBoxtemp, 31-k*4);
-				break;
+	string answer;
+
+	while(answer.length() != 16) {
+		cout << "Please enter your " << keyOrIV <<  " or enter -1 for a " << keyOrIV << " to be generated" << endl;
+		cin >> answer;
+
+		if(!answer.compare("-1")) {
+			cout << endl;
+			answer = keyGenerator(16);
+			break;
+		}
+
+		if(answer.length() != 16) cout << "Your " << keyOrIV << " is not the correct number of bits" << " it is " << answer.length()*4 << " bits" << endl;
+
+		if(answer.length() == 16) {
+			if(answer.find_first_not_of("abcdefABCDEF0123456789") != string::npos) {
+				cout << "The " << keyOrIV << " key contains invalid characters. Please enter only hexadecimal digits" << endl;
+				answer = "";
+				continue;
 			}
-			case 1: {
-				sBoxtemp = bitset<4>(S2[calcSBoxIndex(erO, 47-k*6)]);
-				sboxOutput = fillBitSet(sboxOutput, sBoxtemp, 31-k*4);
-				break;
-			}
-			case 2: {
-				sBoxtemp = bitset<4>(S3[calcSBoxIndex(erO, 47-k*6)]);
-				sboxOutput = fillBitSet(sboxOutput, sBoxtemp, 31-k*4);
-				break;
-			}
-			case 3: {
-				sBoxtemp = bitset<4>(S4[calcSBoxIndex(erO, 47-k*6)]);
-				sboxOutput = fillBitSet(sboxOutput, sBoxtemp, 31-k*4);
-				break;
-			}
-			case 4: {
-				sBoxtemp = bitset<4>(S5[calcSBoxIndex(erO, 47-k*6)]);
-				sboxOutput = fillBitSet(sboxOutput, sBoxtemp, 31-k*4);
-				break;
-			}
-			case 5: {
-				sBoxtemp = bitset<4>(S6[calcSBoxIndex(erO, 47-k*6)]);
-				sboxOutput = fillBitSet(sboxOutput, sBoxtemp, 31-k*4);
-				break;
-			}
-			case 6: {
-				sBoxtemp = bitset<4>(S7[calcSBoxIndex(erO, 47-k*6)]);
-				sboxOutput = fillBitSet(sboxOutput, sBoxtemp, 31-k*4);
-				break;
-			}
-			case 7: {
-				sBoxtemp = bitset<4>(S8[calcSBoxIndex(erO, 47-k*6)]);
-				sboxOutput = fillBitSet(sboxOutput, sBoxtemp, 31-k*4);
-				break;
-			}
-			default: cout << "Something went wrong" << endl;
 		}
 	}
-	return sboxOutput;
+
+	return answer;
+
+
+
+
 }
 
-
-int main(){
-
-	//key scheduling
-	string key, IV;
-
-	//**************uncomment****************
-	while(key.length() != 16) {
-		cout << "Please enter your key or enter -1 for a key to be generated" << endl;
-		cin >> key;
-
-		if(!key.compare("-1")) {
-			cout << endl;
-			key = keyGenerator(16);
-			break;
-		}
-
-		if(key.length() != 16) cout << "Your key is not the correct number of bits" << " it is " << key.length()*4 << " bits" << endl;
-
-		if(key.length() == 16) {
-			if(key.find_first_not_of("abcdefABCDEF0123456789") != string::npos) {
-				cout << "The key contains invalid characters. Please enter only hexadecimal digits" << endl;
-				key = "";
-				continue;
-			}
-		}
-	}
-
-	//**************uncomment****************
-	while(IV.length() != 16) {
-		cout << "Please enter your IV or enter -1 for an IV to be generated" << endl;
-		cin >> IV;
-		if(!IV.compare("-1")) {
-			cout << endl;
-			IV = keyGenerator(16);
-			break;
-		}
-
-		if(IV.length() != 16) cout << "Your IV is not the correct number of bits" << " it is " << key.length()*4 << " bits" << endl;
-
-		if(IV.length() == 16) {
-			if(IV.find_first_not_of("abcdefABCDEF0123456789") != string::npos) {
-				cout << "The IV contains invalid characters. Please enter only hexadecimal digits" << endl;
-				IV = "";
-				continue;
-			}
-		}
-	}
-
-	//comment
-	//	key = "133457799BBCDFF1";
-	//comment
-
+int getMode() {
 	int mode = -1, modeTemp;
 	string modeString;
 
@@ -339,48 +269,59 @@ int main(){
 		cin >> modeString;
 		stringstream modeConvert(modeString);
 		modeConvert >> modeTemp;
-		cout << modeTemp << endl;
 
 		if(modeTemp != 1 && modeTemp != 2) cout << "That is not a valid entry." << endl;
 		else mode = modeTemp;
+
+
+		cout << endl;
 	}
 
-	char outputFileName[1000];
-	cout << "Please enter the name of the output file" << endl;
-	cin >> outputFileName;
 
-	cout << "Your key is " << key << endl;
-	cout << "Your IV is " << IV << endl;
+	return mode;
 
-	if(mode == 1) cout << "You are encrypting" << endl;
-	else cout << "You are decrypting" << endl;
+}
 
-	stringstream ss;
-	ss << hex << key;
+bitset<64> hexStringToBinary64(string hString) {
+	stringstream convertStream;
+	convertStream << hex << hString;
 
 	unsigned long long n;
 
-	ss >> n;
-	bitset<64> b(n);
+	convertStream >> n;
 
+	return bitset<64>(n);	
+
+}
+
+
+bitset<32> sBoxOutputFunc(bitset<48> erO) {
+	bitset<4> sBoxtemp;
+	bitset<32> sboxOutput;
+
+	for(int k = 0; k < 8; k++) {
+		sBoxtemp = bitset<4>(SBOXMAP[k][calcSBoxIndex(erO, 47-k*6)]);
+		sboxOutput = fillBitSet(sboxOutput, sBoxtemp, 31-k*4);		
+
+	} 
+
+}
+
+void keyScheduleGenerator(bitset<64> keyBin) {
 	bitset<56> kPlus;
-
-	for(int i = 56; i > 0; i--) {
-		kPlus[i-1] = b[64-PC1[56-i]];
-	}
-
-	//split key
 	bitset<56> andSet (0b00000000000000000000000000001111111111111111111111111111);
 
 	bitset<28> cshifts[17];
 	bitset<28> dshifts[17];
 
-	bitset<48> keySchedule[16];
-
+	for(int i = 56; i > 0; i--) {
+		kPlus[i-1] = keyBin[64-PC1[56-i]];
+	}
+	//split key
 	cshifts[0] = bitset<28> (((kPlus >> 28) & andSet).to_ulong());
 	dshifts[0] = bitset<28> ((kPlus & andSet).to_ulong());
 
-	//end of split key?
+	//end of split key
 
 	for(int i = 1; i < 17; i++) {
 		cshifts[i] = (cshifts[i-1] << keyShifts[i-1] | cshifts[i-1] >> (28-keyShifts[i-1]));
@@ -395,14 +336,9 @@ int main(){
 	}
 	//end of key schedule
 
-	//read file
-	char inputFile[1000];
-	//***************************uncomment*********
-	if(mode == 1) cout << "Please enter the file path for file to be encrypted." << endl;
-	else cout << "Please enter the file path for file to be decrypted." << endl;
+}
 
-	cin >> inputFile;
-	//***************************uncomment*********
+vector<string> inputFileReader(char inputFile[1000]) {
 
 	char c;
 	string temp = "00000000";
@@ -414,9 +350,6 @@ int main(){
 	ifstream inF(inputFile);
 	//***********uncomment*************
 
-	//output file initialization
-	ofstream outputFile;
-	outputFile.open(outputFileName);
 
 	while(inF.get(c)) {
 		temp[i] = c;
@@ -433,30 +366,30 @@ int main(){
 
 	if(temp.compare("00000000")) inputFileBlocks.push_back(pad(temp, i));
 
-	//convert blocks into binary
-	int j1 = 0;
-	bitset<64> inputFileBlocksBinary[inputFileBlocks.size()];
-	bitset<8> blockToBits;
+	return inputFileBlocks;
 
-	for(int i = 0; i < inputFileBlocks.size(); i++) {
+}
 
-		inputFileBlocksBinary[j1] = stringToBinary(inputFileBlocks[i]);
-		j1++;
-	}
+//vector<bitset<64>> inputBlocksToBits(vector<string> inputFileBlocks) {
+
+//	int j1 = 0;
+//	vector<bitset<64>> inputFileBlocksBinary[inputFileBlocks.size()];
+//	bitset<8> blockToBits;
+
+//	for(int i = 0; i < inputFileBlocks.size(); i++) {
+
+//		inputFileBlocksBinary[j1] = stringToBinary(inputFileBlocks[i]);
+//		j1++;
+//}
 	//end of block to binary
-	//
-	// CBC requires XORing plaintext with old cipher block
-	stringstream IVconvertstream;
-	IVconvertstream << hex << IV;
-	unsigned long long IVn;
-	IVconvertstream >> IVn;
 
-	bitset<64> ciMinusOne(IVn);
-	cout << "The IV in binary is " << ciMinusOne << endl;
-	//end of setting old cipher block
+void des(char outputFileName[1000], bitset<64> inputFileBlocksBinary[], int mode, bitset<64> ciMinusOne, int blockNumber) {
+
+	ofstream outputFile;
+	outputFile.open(outputFileName);
 
 	//go through blocks
-	for(int i = 0; i < inputFileBlocks.size(); i++) {
+	for(int i = 0; i < blockNumber; i++) {
 		bitset<64> currentBlock;
 		//applying CBC mode condition if encrypting
 		if(mode == 1) currentBlock = (inputFileBlocksBinary[i]^=ciMinusOne);
@@ -496,7 +429,7 @@ int main(){
 			//end of XOR
 
 			// S boxes
-			bitset<32> sboxOutput = sBoxOutputFunc(er0);
+			bitset<32> sboxOutput = sBoxOutputFunc(erO);
 			// end of S boxes
 
 			//permuation of output of s boxes
@@ -529,12 +462,114 @@ int main(){
 
 		cout << R16L16FP << endl;
 
+		int offset = 0;
+
+//		if(i == inputFileBlocks.size() - 1) offset = 8 - i;
+
 		for(int k = 7; k >= 0; k--) {
-			outputFile << next8BitsToChar(R16L16FP, 8*k);
+
+//			if(i == inputFileBlocks.size() - 1) outputFile << lastBlockToChar(R16L16FP, 
+			
+			outputFile << next8BitsToChar(R16L16FP, 8*k, offset);
 		}
 		//end of permutation
 	}
 	//end of outer loop for blocks
 	outputFile.close();
+
+
+
+}
+
+int main(){
+
+	//key scheduling
+	string key, IV;
+	int mode;
+	char outputFileName[1000];
+	
+	key = getHexStringInput("key");
+
+	IV = getHexStringInput("IV");
+
+//	cout << "Key is " << key << " IV is " << IV << endl;
+
+	mode = getMode();
+
+//	cout << "Mode is " << mode << endl;
+	cout << "Please enter the name of the output file" << endl;
+	cin >> outputFileName;
+
+	cout << "Your key is " << key << endl;
+	cout << "Your IV is " << IV << endl;
+
+	if(mode == 1) cout << "You are encrypting" << endl;
+	else cout << "You are decrypting" << endl;
+
+	bitset<64> keyBin = hexStringToBinary64(key);
+
+//	bitset<48> keySchedule[16] = 
+
+	keyScheduleGenerator(keyBin);
+
+//	cout << "key schedule is as follows" << endl;
+//	for(int i = 0; i < 16; i++) {
+//		cout << keySchedule[i] << endl;
+
+
+//	}
+
+//	cout << "The key in binary is " << keyBin << endl;
+
+	//read file
+	char inputFile[1000];
+	//***************************uncomment*********
+	if(mode == 1) cout << "Please enter the file path for file to be encrypted." << endl;
+	else cout << "Please enter the file path for file to be decrypted." << endl;
+
+	cin >> inputFile;
+
+	vector<string> inputFileBlocks = inputFileReader(inputFile);
+
+//	for(int i = 0; i < inputFileBlocks.size(); i++) {
+//		cout << inputFileBlocks[i] << endl;
+
+
+//	}
+
+	//output file initialization
+
+	//***************************uncomment*********
+
+//	int count = i;
+
+	//convert blocks into binary
+
+//	vector<bitset<64>> inputFileBlocksBinary[inputFileBlocks.size()];
+
+
+//	inputFileBlocksBinary = inputBlocksToBits(inputFileBlocks);
+
+	int j1 = 0;
+	bitset<64> inputFileBlocksBinary[inputFileBlocks.size()];
+	bitset<8> blockToBits;
+
+	for(int i = 0; i < inputFileBlocks.size(); i++) {
+
+		inputFileBlocksBinary[j1] = stringToBinary(inputFileBlocks[i]);
+		j1++;
+}
+	//end of block to binary
+	//
+	// CBC requires XORing plaintext with old cipher block
+//	stringstream IVconvertstream;
+//	IVconvertstream << hex << IV;
+//	unsigned long long IVn;
+//	IVconvertstream >> IVn;
+
+	bitset<64> ciMinusOne(hexStringToBinary64(IV));
+	cout << "The IV in binary is " << ciMinusOne << endl;
+	//end of setting old cipher block
+	des(outputFileName, inputFileBlocksBinary, mode, ciMinusOne, inputFileBlocks.size());
 	return 0;
 }
