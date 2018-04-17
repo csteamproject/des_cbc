@@ -5,7 +5,7 @@ using namespace std;
 
 char hexDigits[] = {'1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F'};
 int keyShifts[] = {1, 1, 2, 2, 2, 2, 2, 2, 1, 2, 2, 2, 2, 2, 2, 1};
-bitset<48> keySchedule[16];
+//bitset<48> keySchedule[16];
 
 /********************************************/
 /* Tables for initial and final permutation */
@@ -226,7 +226,7 @@ bitset<64> desutils::combineBitSet(bitset<32> a, bitset<32> b) {
 // Conforms with openssl default for padding
 string desutils::pad(string a, int blockLength) {
 	string answer = "00000000";
-	int padLength = 8 - blockLength;
+	int padLength = 8 - blockLength%8;
 
 	for(int i = 0; i < 8; i++) answer[i] = (char)padLength;
 	for(int i = 0; i < blockLength; i++) answer[i] = a[i];
@@ -316,12 +316,16 @@ bitset<32> desutils::sBoxOutputFunc(bitset<48> erO) {
 
 // Function that produces the key schedule using the key in binary form as
 // input
-void desutils::keyScheduleGenerator(bitset<64> keyBin) {
+std::vector<bitset<48> > desutils::keyScheduleGenerator(bitset<64> keyBin) {
 	bitset<56> kPlus;
 	bitset<56> andSet (0b00000000000000000000000000001111111111111111111111111111);
 
 	bitset<28> cshifts[17];
 	bitset<28> dshifts[17];
+
+	const int size = 16;
+
+	std::vector<bitset<48> > keySchedule(size);
 
 	for(int i = 56; i > 0; i--) {
 		kPlus[i-1] = keyBin[64-PC1[56-i]];
@@ -344,6 +348,8 @@ void desutils::keyScheduleGenerator(bitset<64> keyBin) {
 		}
 	}
 	//end of key schedule
+
+	return keySchedule;
 }
 
 // Function that reads from file and outputs a vector of strings
@@ -370,14 +376,15 @@ vector<string> desutils::inputFileReader(char inputFile[1000]) {
 	inF.close();
 	//end of read file
 
-	if(temp.compare("00000000")) inputFileBlocks.push_back(pad(temp, i));
+	inputFileBlocks.push_back(pad(temp, i));
+
 	return inputFileBlocks;
 }
 
 // Function that implements the DES algorithm in CBC mode
 // Depending on the mode selected, this function either decrypts
 // or encrypts using DES in CBC mode
-void desutils::des(char outputFileName[1000], bitset<64> inputFileBlocksBinary[], int mode, bitset<64> ciMinusOne, int blockNumber) {
+void desutils::des(char outputFileName[1000], bitset<64> inputFileBlocksBinary[], int mode, bitset<64> ciMinusOne, int blockNumber, vector<bitset<48> > keySchedule) {
 
 	ofstream outputFile;
 	outputFile.open(outputFileName);

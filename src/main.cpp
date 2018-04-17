@@ -27,7 +27,7 @@ int main(){
 	else cout << "You are decrypting" << endl;
 
 	bitset<64> keyBin = d.hexStringToBinary64(key);
-	d.keyScheduleGenerator(keyBin);
+	vector<bitset<48> > keySchedule = d.keyScheduleGenerator(keyBin);
 
 	//read file
 	char inputFile[1000];
@@ -54,6 +54,6 @@ int main(){
 	//end of setting old cipher block
 	
 	//calling of des function
-	d.des(outputFileName, inputFileBlocksBinary, mode, ciMinusOne, inputFileBlocks.size());
+	d.des(outputFileName, inputFileBlocksBinary, mode, ciMinusOne, inputFileBlocks.size(), keySchedule);
 	return 0;
 }
