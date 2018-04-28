@@ -31,12 +31,30 @@ int main(){
 
 	//read file
 	char inputFile[1000];
+
 	if(mode == 1) cout << "Please enter the file path for file to be encrypted." << endl;
 	else cout << "Please enter the file path for file to be decrypted." << endl;
 
 	cin >> inputFile;
 
+	//end of inputs
+
+	ifstream inF(inputFile);
+	
+	//check if file can be opened
+	if(!inF.is_open()) {
+		cout << "Could not open file" << endl;
+
+		return 0;
+	} 
+
+	
+	inF.close();
+	//end of check for file
+
 	vector<string> inputFileBlocks = d.inputFileReader(inputFile);
+
+	//end of reading file
 
 	//convert input blocks into binary
 	int j1 = 0;
@@ -49,9 +67,9 @@ int main(){
 	}
 	//end of conversion 
 
-	// CBC requires XORing plaintext with old cipher block
+	// CBC requires XORing plaintext with IV so we set the old ciphertext block to IV
 	bitset<64> ciMinusOne(d.hexStringToBinary64(IV));
-	//end of setting old cipher block
+	//end of setting old cipher block to IV
 	
 	//calling of des function
 	d.des(outputFileName, inputFileBlocksBinary, mode, ciMinusOne, inputFileBlocks.size(), keySchedule);
