@@ -8,12 +8,14 @@
 #include <vector>
 #include <fstream>
 
+//#include "desutils.cpp"
+
 using namespace std;
 
 class desutils {
 private:
 public:
-  void des(char outputFileName[1000], bitset<64> inputFileBlocksBinary[], int mode, bitset<64> ciMinusOne, int blockNumber, vector<bitset<48> > keySchedule);
+  void des(char outputFileName[1000], bitset<64> inputFileBlocksBinary[], int mode, bitset<64> ciMinusOne, int blockNumber);
   string keyGenerator(const int len);
   bitset<64> stringToBinary(string a);
   int calcSBoxIndex(bitset<48> b, int s);
@@ -25,7 +27,7 @@ public:
   int getMode();
   bitset<64> hexStringToBinary64(string hString);
   bitset<32> sBoxOutputFunc(bitset<48> erO);
-  std::vector<bitset<48> > keyScheduleGenerator(bitset<64> keyBin);
+  void keyScheduleGenerator(bitset<64> keyBin);
   vector<string> inputFileReader(char inputFile[1000]);
 };
 
