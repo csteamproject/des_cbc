@@ -8,8 +8,6 @@
 #include <vector>
 #include <fstream>
 
-//#include "desutils.cpp"
-
 using namespace std;
 
 class desutils {
@@ -28,6 +26,9 @@ public:
   bitset<64> hexStringToBinary64(string hString);
   bitset<32> sBoxOutputFunc(bitset<48> erO);
   std::vector<bitset<48> > keyScheduleGenerator(bitset<64> keyBin);
+  
+  //File Reading Functions
+  bool inputFileValidation(char inputFile[1000]);
   vector<string> inputFileReader(char inputFile[1000]);
 };
 

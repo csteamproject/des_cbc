@@ -46,8 +46,7 @@ int main(){
 		cout << "Could not open file" << endl;
 
 		return 0;
-	} 
-
+	}
 	
 	inF.close();
 	//end of check for file

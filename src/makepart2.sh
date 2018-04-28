@@ -2,4 +2,4 @@
 
 make clean
 make part2
-./part2 Test Help Alex
+./part2 test.txt test.txt test.txt test.txt

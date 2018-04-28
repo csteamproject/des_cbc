@@ -349,6 +349,19 @@ std::vector<bitset<48> > desutils::keyScheduleGenerator(bitset<64> keyBin) {
 	return keySchedule;
 }
 
+//Function to check whether an inputFile is a valid file
+bool desutils::inputFileValidation(char inputFile[1000]) {
+	
+	ifstream inF(inputFile);
+	
+	//check if file can be opened
+	if(!inF.is_open()) {
+		return false;
+	}	
+	inF.close();
+	return true;
+}
+
 // Function that reads from file and outputs a vector of strings
 // which represent the blocks for DES
 vector<string> desutils::inputFileReader(char inputFile[1000]) {
