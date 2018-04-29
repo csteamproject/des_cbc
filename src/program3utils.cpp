@@ -2,6 +2,7 @@
 
 using namespace std;
 
-FILE* desutils::getFile(unsigned char* fileName) {
-  return fopen(fileName, "r");
+FILE* program3utils::getFile(unsigned char* fileName) {
+   FILE* a;
+   return a;
 }

@@ -1,4 +1,5 @@
 #include "desutils.h"
+#include "program3utils.h"
 
 using namespace std;
 
@@ -23,10 +24,13 @@ int main(int argc, char* argv[]){
     cout << "File found" << endl;
   }
   
-  FILE* esk = p.getFile(argv[2]);
-  FILE* tppk = p.getFile(argv[3]);
-  FILE* pk = p.getFile(argv[4]);
+//  FILE* esk = p.getFile((unsigned char*)argv[2]);
+//  FILE* tppk = p.getFile((unsigned char*)argv[3]);
+//  FILE* pk = p.getFile((unsigned char*)argv[4]);
 
+    FILE* esk = fopen(argv[2], "r");
+    FILE* tppk = fopen(argv[3], "r");
+    FILE* pk = fopen(argv[4], "r");
   
   
 }
