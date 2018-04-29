@@ -31,6 +31,9 @@ int main(int argc, char* argv[]){
     FILE* esk = fopen(argv[2], "r");
     FILE* tppk = fopen(argv[3], "r");
     FILE* pk = fopen(argv[4], "r");
+
+
+    cout << p.GetFileSize(argv[2]) << endl;
   
   
 }
