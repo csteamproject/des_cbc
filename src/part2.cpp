@@ -27,7 +27,9 @@ int main(int argc, char* argv[]){
   p.getSessionKey(argv);
 
 // start of des
-
+  
+  char encryptedfileName[1000] = "encrypted_message.enc";
+  char decrypedfileName[1000] = "decrypted_message.txt";
   vector<string> ptblocks = d.inputFileReader("plaintext.txt");
 
   bitset<64> ptblocksbin[ptblocks.size()];
@@ -38,17 +40,17 @@ int main(int argc, char* argv[]){
   vector<string> keyBlocks = d.inputFileReader("sessionkey.txt");
 
   bitset<64> keyBin = d.hexStringToBinary64(keyBlocks[0]);
-
   bitset<64> ivBin = d.hexStringToBinary64("0000000000000000");
-
-  char encryptedfileName[1000] = "encrypted_message.enc";
-
-  char decrypedfileName[1000] = "decrypted_message.txt";
 
   std::vector< bitset<48> > keySchedule = d.keyScheduleGenerator(ivBin);
 
   d.des(encryptedfileName, ptblocksbin, 1, ivBin, ptblocks.size(), keySchedule);
-
+  
+  ptblocks = d.inputFileReader("encrypted_message.enc");
+  ptblocksbin[ptblocks.size()];
+  for (int i = 0; i < ptblocks.size(); i++) 
+    ptblocksbin[i] = (d.stringToBinary(ptblocks[i]));
+  
   d.des(decrypedfileName, ptblocksbin, 2, ivBin, ptblocks.size(), keySchedule);
   
 
