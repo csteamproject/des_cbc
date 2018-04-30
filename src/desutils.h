@@ -19,7 +19,7 @@ public:
   int calcSBoxIndex(bitset<48> b, int s);
   bitset<32> fillBitSet(bitset<32> initial, bitset<4> added, int s);
   bitset<64> combineBitSet(bitset<32> a, bitset<32> b);
-  string pad(string a, int blockLength);
+  
   char next8BitsToChar(bitset<64> a, int s, int ofs);
   string getHexStringInput(string keyOrIV);
   int getMode();
@@ -30,6 +30,8 @@ public:
   //File Reading Functions
   bool inputFileValidation(char inputFile[1000]);
   vector<string> inputFileReader(char inputFile[1000]);
+
+  string pad(string a, int blockLength);
 };
 
 #endif

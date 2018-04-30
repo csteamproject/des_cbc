@@ -2,17 +2,23 @@
 #define PROGRAM3UTILS_H
 
 #include <openssl/evp.h>
+#include <openssl/crypto.h>
 #include <openssl/conf.h>
 #include <openssl/err.h>
+#include <openssl/engine.h>
+#include <openssl/rsa.h>
+#include <openssl/pem.h>
 #include <string>
+#include <sys/stat.h>
+#include <iostream>
 
 using namespace std;
 
 class program3utils {
 private:
 public:
-  FILE* getFile(unsigned char* fileName);
-  long GetFileSize(string filename);
+  void writeFile(unsigned char* out, char* fileName);
+  void getSessionKey(char* files[]);
 };
 
 #endif
