@@ -19,6 +19,7 @@ private:
 public:
   void writeFile(unsigned char* out, char* fileName);
   void getSessionKey(char* files[]);
+  void signEncryptedMessage(char* files[]);
 };
 
 #endif
