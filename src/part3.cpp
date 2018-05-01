@@ -27,8 +27,8 @@ int main(int argc, char* argv[]){
   char decryptedfileName[1000] = "decrypted_message.txt";
   char ivfileName[1000] = "ivFile.txt";
   
-  vector<string> ctblocks = d.inputFileReader(argv[3]);  
-  vector<string> keyBlocks = d.inputFileReader(argv[2]);
+  vector<string> ctblocks = d.inputFileReader(argv[3], 2);  
+  vector<string> keyBlocks = d.inputFileReader(argv[2], 1);
   
   string iv = p.inputFileReadIV(ivfileName);
   

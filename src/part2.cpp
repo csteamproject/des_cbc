@@ -38,7 +38,7 @@ int main(int argc, char* argv[]){
   //unsigned char ivArray[1000];
   //vector<string> ptblocks = d.inputFileReader("plaintext.txt");
   
-vector<string> ptblocks = d.inputFileReader(plaintext);
+vector<string> ptblocks = d.inputFileReader(plaintext, 1);
 
 
   bitset<64> ptblocksbin[ptblocks.size()];
@@ -46,7 +46,7 @@ vector<string> ptblocks = d.inputFileReader(plaintext);
   for (int i = 0; i < ptblocks.size(); i++) 
     ptblocksbin[i] = (d.stringToBinary(ptblocks[i]));
 
-  vector<string> keyBlocks = d.inputFileReader(sessionkey);
+  vector<string> keyBlocks = d.inputFileReader(sessionkey, 1);
   
   string iv = d.keyGenerator(16);
 

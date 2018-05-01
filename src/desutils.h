@@ -29,7 +29,7 @@ public:
   
   //File Reading Functions
   bool inputFileValidation(char inputFile[1000]);
-  vector<string> inputFileReader(char inputFile[1000]);
+  vector<string> inputFileReader(char inputFile[1000], int mode);
 
   string pad(string a, int blockLength);
 };

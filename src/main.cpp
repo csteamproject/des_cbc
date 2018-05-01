@@ -51,7 +51,7 @@ int main(){
 	inF.close();
 	//end of check for file
 
-	vector<string> inputFileBlocks = d.inputFileReader(inputFile);
+	vector<string> inputFileBlocks = d.inputFileReader(inputFile, mode);
 
 	//end of reading file
 

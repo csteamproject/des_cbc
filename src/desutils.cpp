@@ -364,7 +364,7 @@ bool desutils::inputFileValidation(char inputFile[1000]) {
 
 // Function that reads from file and outputs a vector of strings
 // which represent the blocks for DES
-vector<string> desutils::inputFileReader(char inputFile[1000]) {
+vector<string> desutils::inputFileReader(char inputFile[1000], int mode) {
 	char c;
 	string temp = "00000000";
 
@@ -387,6 +387,18 @@ vector<string> desutils::inputFileReader(char inputFile[1000]) {
 	//end of read file
 
 	if(temp.compare("00000000")) inputFileBlocks.push_back(pad(temp, i));
+	else {
+		if(mode == 1) {
+			cout << "Padd block" << endl;
+			string hold = "00000000";
+			int padLength = 8;
+
+			for(int i = 0; i < 8; i++) hold[i] = (char)padLength;
+
+			inputFileBlocks.push_back(hold);
+		}
+
+	}
 	return inputFileBlocks;
 }
 
