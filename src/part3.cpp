@@ -23,10 +23,28 @@ int main(int argc, char* argv[]){
     }
     cout << "File found" << endl;
   }
-
-    FILE* esk = fopen(argv[2], "r");
-    FILE* tppk = fopen(argv[3], "r");
-    FILE* pk = fopen(argv[4], "r");
   
+  char decryptedfileName[1000] = "decrypted_message.txt";
+  char ivfileName[1000] = "ivFile.txt";
+  
+  vector<string> ctblocks = d.inputFileReader(argv[3]);  
+  vector<string> keyBlocks = d.inputFileReader(argv[2]);
+  
+  string iv = p.inputFileReadIV(ivfileName);
+  
+  cout << "IV : " << iv << endl;
+  bitset<64> ctblocksbin[ctblocks.size()];
+  bitset<64> keyBin = d.stringToBinary(keyBlocks[0]);
+  bitset<64> ivBin = d.hexStringToBinary64(iv);
+  
+  std::vector< bitset<48> > keySchedule = d.keyScheduleGenerator(keyBin);
+
+  //ctblocksbin[ptblocks.size()];
+  for (int i = 0; i < ctblocks.size(); i++) 
+    ctblocksbin[i] = (d.stringToBinary(ctblocks[i]));
+  
+  d.des(decryptedfileName, ctblocksbin, 2, ivBin, ctblocks.size(), keySchedule);  
+  
+  p.verifySignature(argv);
   
 }

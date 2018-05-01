@@ -29,31 +29,40 @@ int main(int argc, char* argv[]){
 // start of des
   
   char encryptedfileName[1000] = "encrypted_message.enc";
-  char decrypedfileName[1000] = "decrypted_message.txt";
-  vector<string> ptblocks = d.inputFileReader("plaintext.txt");
+  char plaintext[1000] = "plaintext.txt";
+  char sessionkey[1000] = "sessionkey.txt";
+  char ivfileName[1000] = "ivFile.txt";
+  
+  ofstream ivFile;
+  ivFile.open("ivFile.txt");
+  //unsigned char ivArray[1000];
+  //vector<string> ptblocks = d.inputFileReader("plaintext.txt");
+  
+vector<string> ptblocks = d.inputFileReader(plaintext);
+
 
   bitset<64> ptblocksbin[ptblocks.size()];
 
   for (int i = 0; i < ptblocks.size(); i++) 
     ptblocksbin[i] = (d.stringToBinary(ptblocks[i]));
 
-  vector<string> keyBlocks = d.inputFileReader("sessionkey.txt");
+  vector<string> keyBlocks = d.inputFileReader(sessionkey);
+  
+  string iv = d.keyGenerator(16);
 
-  bitset<64> keyBin = d.hexStringToBinary64(keyBlocks[0]);
-  bitset<64> ivBin = d.hexStringToBinary64("0000000000000000");
+  for(int i = 0; i < 16; i++) ivFile << iv[i];
 
-  std::vector< bitset<48> > keySchedule = d.keyScheduleGenerator(ivBin);
+  bitset<64> keyBin = d.stringToBinary(keyBlocks[0]);
+  bitset<64> ivBin = d.hexStringToBinary64(iv);
+
+  std::vector< bitset<48> > keySchedule = d.keyScheduleGenerator(keyBin);
 
   d.des(encryptedfileName, ptblocksbin, 1, ivBin, ptblocks.size(), keySchedule);
   
-  ptblocks = d.inputFileReader("encrypted_message.enc");
-  ptblocksbin[ptblocks.size()];
-  for (int i = 0; i < ptblocks.size(); i++) 
-    ptblocksbin[i] = (d.stringToBinary(ptblocks[i]));
+  //ptblocks = d.inputFileReader("encrypted_message.enc");
   
-  d.des(decrypedfileName, ptblocksbin, 2, ivBin, ptblocks.size(), keySchedule);
   
-
+  p.signEncryptedMessage(argv[4]);
   
 //end of des
   

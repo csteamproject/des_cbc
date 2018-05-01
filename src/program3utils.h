@@ -19,7 +19,9 @@ private:
 public:
   void writeFile(unsigned char* out, char* fileName);
   void getSessionKey(char* files[]);
-  void signEncryptedMessage(char* files[]);
+  void signEncryptedMessage(char* privkeyName);
+  void verifySignature(char* files[]);
+  string inputFileReadIV(char inputFile[1000]);
 };
 
 #endif
