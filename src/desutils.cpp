@@ -389,7 +389,6 @@ vector<string> desutils::inputFileReader(char inputFile[1000], int mode) {
 	if(temp.compare("00000000")) inputFileBlocks.push_back(pad(temp, i));
 	else {
 		if(mode == 1) {
-			cout << "Padd block" << endl;
 			string hold = "00000000";
 			int padLength = 8;
 
