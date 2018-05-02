@@ -47,6 +47,8 @@ void program3utils::getSessionKey(char* files[]) {
   fseek(esk, 0, SEEK_END);  
   inlen = ftell(esk);
   fseek(esk, 0, SEEK_SET);
+
+  char sessionkeyfileName[100] = "sessionkey.txt";
   
   in = (unsigned char*)malloc(inlen);  
   fread(in, 1, inlen, esk);
@@ -76,7 +78,7 @@ void program3utils::getSessionKey(char* files[]) {
 
   /* Encrypted data is outlen bytes written to buffer out */
 
-  writeFile(out, "sessionkey.txt");
+  writeFile(out, sessionkeyfileName);
   fclose(tppk);
   free(in);
   free(out);
