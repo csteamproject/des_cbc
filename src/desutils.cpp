@@ -404,7 +404,7 @@ vector<string> desutils::inputFileReader(char inputFile[1000], int mode) {
 // Function that implements the DES algorithm in CBC mode
 // Depending on the mode selected, this function either decrypts
 // or encrypts using DES in CBC mode
-void desutils::des(char outputFileName[1000], bitset<64> inputFileBlocksBinary[], int mode, bitset<64> ciMinusOne, int blockNumber, vector<bitset<48> > keySchedule) {
+void desutils::des(char outputFileName[1000], bitset<64> inputFileBlocksBinary[], int mode, bitset<64> ciMinusOne, int blockNumber, vector<bitset<48> > keySchedule, int pad) {
 
 	ofstream outputFile;
 	outputFile.open(outputFileName);
@@ -483,9 +483,30 @@ void desutils::des(char outputFileName[1000], bitset<64> inputFileBlocksBinary[]
 
 
 		int offset = 0;
+		if(i < blockNumber-1 || mode == 1) {
+			for(int k = 7; k >= 0; k--) {
+				outputFile << next8BitsToChar(R16L16FP, 8*k, offset);
+			}
 
-		for(int k = 7; k >= 0; k--) {
-			outputFile << next8BitsToChar(R16L16FP, 8*k, offset);
+		}
+
+		else {
+
+			if(pad) {
+				int padChar = (int) next8BitsToChar(R16L16FP, 0, offset);
+				for(int k = 7; k >= padChar; k--) {
+					outputFile << next8BitsToChar(R16L16FP, 8*k, offset);
+				}				
+				
+			}
+
+			else{
+				for(int k = 7; k >= 0; k--) {
+					outputFile << next8BitsToChar(R16L16FP, 8*k, offset);
+				}				
+
+			}
+
 		}
 		//end of permutation
 	}

@@ -43,7 +43,7 @@ int main(int argc, char* argv[]){
   for (int i = 0; i < ctblocks.size(); i++) 
     ctblocksbin[i] = (d.stringToBinary(ctblocks[i]));
   
-  d.des(decryptedfileName, ctblocksbin, 2, ivBin, ctblocks.size(), keySchedule);  
+  d.des(decryptedfileName, ctblocksbin, 2, ivBin, ctblocks.size(), keySchedule, 1);  
   
   p.verifySignature(argv);
   

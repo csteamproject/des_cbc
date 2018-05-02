@@ -13,7 +13,7 @@ using namespace std;
 class desutils {
 private:
 public:
-  void des(char outputFileName[1000], bitset<64> inputFileBlocksBinary[], int mode, bitset<64> ciMinusOne, int blockNumber, vector<bitset<48> > keySchedule);
+  void des(char outputFileName[1000], bitset<64> inputFileBlocksBinary[], int mode, bitset<64> ciMinusOne, int blockNumber, vector<bitset<48> > keySchedule, int pad);
   string keyGenerator(const int len);
   bitset<64> stringToBinary(string a);
   int calcSBoxIndex(bitset<48> b, int s);

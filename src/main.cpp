@@ -71,6 +71,6 @@ int main(){
 	//end of setting old cipher block to IV
 	
 	//calling of des function
-	d.des(outputFileName, inputFileBlocksBinary, mode, ciMinusOne, inputFileBlocks.size(), keySchedule);
+	d.des(outputFileName, inputFileBlocksBinary, mode, ciMinusOne, inputFileBlocks.size(), keySchedule, 0);
 	return 0;
 }

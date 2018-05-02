@@ -57,7 +57,7 @@ vector<string> ptblocks = d.inputFileReader(plaintext, 1);
 
   std::vector< bitset<48> > keySchedule = d.keyScheduleGenerator(keyBin);
 
-  d.des(encryptedfileName, ptblocksbin, 1, ivBin, ptblocks.size(), keySchedule);
+  d.des(encryptedfileName, ptblocksbin, 1, ivBin, ptblocks.size(), keySchedule, 0);
   
   //ptblocks = d.inputFileReader("encrypted_message.enc");
   
