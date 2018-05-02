@@ -8,6 +8,7 @@ int main(int argc, char* argv[]){
   desutils d;
   program3utils p;
 
+// checking input
   if (argc != 5) {
     cerr << "Incorrect argument parameters!" << endl;
     return 1;
@@ -23,14 +24,16 @@ int main(int argc, char* argv[]){
     }
     cout << "File found" << endl;
   }
-  
+// end of input checking
+
+// start of des decrypt (outputs decrypted message to a file)
   char decryptedfileName[1000] = "decrypted_message.txt";
   char ivfileName[1000] = "ivFile.txt";
-  
+
   vector<string> ctblocks = d.inputFileReader(argv[3], 2);  
   vector<string> keyBlocks = d.inputFileReader(argv[2], 1);
   
-  string iv = p.inputFileReadIV(ivfileName);
+  string iv = p.inputFileReadIV(ivfileName); // read iv from file
   
   cout << "IV : " << iv << endl;
   bitset<64> ctblocksbin[ctblocks.size()];
@@ -44,7 +47,10 @@ int main(int argc, char* argv[]){
     ctblocksbin[i] = (d.stringToBinary(ctblocks[i]));
   
   d.des(decryptedfileName, ctblocksbin, 2, ivBin, ctblocks.size(), keySchedule, 1);  
-  
+// end of des decrypt
+
+//verifcation of signature
   p.verifySignature(argv);
+//end of verifcation of signature
   
 }

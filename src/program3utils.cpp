@@ -3,6 +3,8 @@
 
 using namespace std;
 
+// Function used to write first 8 bytes of unsigned char pointer to a file
+// Used to write session key to file
 void program3utils::writeFile(unsigned char* out, char* fileName) {
   FILE* write;
    
@@ -11,6 +13,8 @@ void program3utils::writeFile(unsigned char* out, char* fileName) {
   fclose(write);
 }
 
+// Function that reads a 16 digit long hex string from file
+// Used to read IV from file
 string program3utils::inputFileReadIV(char inputFile[1000]) {
 	char c;
 	string temp = "0000000000000000";
@@ -30,12 +34,14 @@ string program3utils::inputFileReadIV(char inputFile[1000]) {
 	return temp;
 }
 
-
+// Function that takes encrypted session key file and outputs decryped session key
+// Uses third party public key and library functions
 void program3utils::getSessionKey(char* files[]) {
 
   //tppk = third party public key: TA's key.
   //test.txt ../encrypted_session.key ../pubkey.pem ../privkey.pem  
 
+//set up inputs
   EVP_PKEY_CTX* ctx;
   unsigned char *out, *in;
   size_t outlen, inlen;
@@ -56,6 +62,8 @@ void program3utils::getSessionKey(char* files[]) {
   key = PEM_read_PUBKEY(tppk, NULL, NULL, NULL);
 
   ctx = EVP_PKEY_CTX_new(key, NULL);
+//encryption
+//error checking
   if (!ctx)
      cerr << "Error with the ctx" << endl;
   if (EVP_PKEY_encrypt_init(ctx) <= 0)
@@ -63,7 +71,7 @@ void program3utils::getSessionKey(char* files[]) {
   if (EVP_PKEY_CTX_set_rsa_padding(ctx, RSA_NO_PADDING) <= 0)
      cerr << "Error with the ctx RSA padding" << endl;
 
-  /* Determine buffer length */
+// set outlen
   if (EVP_PKEY_encrypt(ctx, NULL, &outlen, in, inlen) <= 0)
      cerr << "Error with the ctx RSA padding" << endl;
   
@@ -76,19 +84,25 @@ void program3utils::getSessionKey(char* files[]) {
   if (EVP_PKEY_encrypt(ctx, out, &outlen, in, inlen) <= 0)
      cerr << "Error with EVP PKEY encrypt" << endl;
 
-  /* Encrypted data is outlen bytes written to buffer out */
+//encrypted message (decrypted session key) is stored in out
+
+//write session key to file
 
   writeFile(out, sessionkeyfileName);
+
+// close files and free buffers
   fclose(tppk);
   free(in);
   free(out);
     
 }
 
+// Function that signs encrypted message and outputs to a separate file
+// Uses a private key and encrypted message file with library functions to sign
 void program3utils::signEncryptedMessage(char* privkeyName) {
 
+ //set up of inputs
  EVP_PKEY_CTX *ctx;
- /* md is a SHA-256 digest in this example. */
  unsigned char *md, *sig;
  size_t mdlen = 32, siglen;
  EVP_PKEY *signing_key;
@@ -105,53 +119,53 @@ void program3utils::signEncryptedMessage(char* privkeyName) {
  signing_key = PEM_read_PrivateKey(privkey, NULL, NULL, NULL);
  
  ctx = EVP_PKEY_CTX_new(signing_key, NULL);
+//begining of signing
+//error checking
  if (!ctx) {
      cerr << "ctx error!" << endl;
      exit(1);
  }
-     /* Error occurred */
  if (EVP_PKEY_sign_init(ctx) <= 0) {
      cerr << "EVP sign init error!" << endl;
      exit(1);
  }
-     /* Error */
  if (EVP_PKEY_CTX_set_rsa_padding(ctx, RSA_PKCS1_PADDING) <= 0) {
      cerr << "RSA padding errors!" << endl;
      exit(1);
  }
-     /* Error */
  if (EVP_PKEY_CTX_set_signature_md(ctx, EVP_sha256()) <= 0) {
      cerr << "PKEY set sig error!" << endl;
      exit(1);
  }
-     /* Error */
 
- /* Determine buffer length */
+// set siglen
  if (EVP_PKEY_sign(ctx, NULL, &siglen, md, mdlen) <= 0) {
      cerr << "PKEY sign error!" << endl;
      exit(1);
  }
-     /* Error */
 
  sig = (unsigned char*)OPENSSL_malloc(siglen);
+
+//check malloc
 
  if (!sig) {
      cerr << "sig error!" << endl;
      exit(1);
  }
-     /* malloc failure */
 
  if (EVP_PKEY_sign(ctx, sig, &siglen, md, mdlen) <= 0) {
      cerr << "PKEY sign error 2!" << endl;
      exit(1);
  }
-     /* Error */
+//end of signing
+//signature is written to sig 
 
- /* Signature is siglen bytes written to buffer sig */
+//write signature to a file
  siglen = 256;
  FILE* encSign = fopen("enc_sign.txt", "w");
  fwrite(sig, 1, siglen, encSign);
- 
+
+// free buffers and close files
  fclose(encSign);
  fclose(privkey);
  fclose(encMsg);
@@ -160,9 +174,12 @@ void program3utils::signEncryptedMessage(char* privkeyName) {
     
 }
 
+// Function that takes a signature file and encrypted message file as well as a public key
+// with library functions to verify a signature 
+// Prints out result to console
 void program3utils::verifySignature(char* files[]) {
 
-
+//set up of inputs
  EVP_PKEY_CTX *ctx;
 
  unsigned char *md, *sig;
@@ -188,28 +205,35 @@ void program3utils::verifySignature(char* files[]) {
  verify_key = PEM_read_PUBKEY(pubkey, NULL, NULL, NULL);
  
  ctx = EVP_PKEY_CTX_new(verify_key, NULL);
+
+//verification
+//error checking
+//check ctx
  if (!ctx) {
      cerr << "ctx error!" << endl;
      exit(1);
  }
-     /* Error occurred */
+//initialize
  if (EVP_PKEY_verify_init(ctx) <= 0) {
      cerr << "EVP sign init error!" << endl;
      exit(1);
  }
-     /* Error */
+//pad
  if (EVP_PKEY_CTX_set_rsa_padding(ctx, RSA_PKCS1_PADDING) <= 0) {
      cerr << "RSA padding errors!" << endl;
      exit(1);
  }
-     /* Error */
+
  if (EVP_PKEY_CTX_set_signature_md(ctx, EVP_sha256()) <= 0) {
      cerr << "PKEY set sig error!" << endl;
      exit(1);
  }
-     /* Error */
+
     ret = EVP_PKEY_verify(ctx, sig, siglen, md, mdlen);
-//    cout << ret << endl;
+//end of verification
+
+//if value in ret is not 0 then signature is valid
+//print out result of verification
     
     (ret) ? cout << "Signature valid" << endl : cout << "Signature not valid" << endl;  
       

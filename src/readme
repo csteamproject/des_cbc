@@ -1,0 +1,66 @@
+----
+USE
+----
+
+Part 2
+-------
+Source files: part2.cpp program3utils.cpp program3utils.h desutils.h desutils.cpp 
+Other files: makefile makepart2.sh
+Remaining files mentioned below
+
+To use the part2 program simply run the "sh makepart2.sh" command which should both compile and run the program.
+Alternatively, you can run the "make part2" command and then run the executable that is produced with "./part2 plaintext_filename encrypted_session_key_filename publickey_in_pem_format privatekey_in_pem_format"
+
+with filenames replaced with the names shown here
+
+1. The use of this program allows the user to provide the program with files for a plaintext, an encrypted session key, a public key in pem format(third party), and a private key in pem format.
+These are all taken as commandline parameters.
+
+2. The program checks to see if it can find all files. If not it will output an error message and return.
+
+
+3. The program then reads the encrypted session key, encrypts it with the provided public key, and outputs the decrypted session key to a file called "sessionkey.txt"
+If this fails, error messages will be printed out and the program will exit.
+
+4. Next the program reads the session key and performs DES encryption on the plaintext message (read from file).
+
+A random IV is generated and is written to a file called "ivFile.txt".
+
+The result of the encryption is printed to a file called "encrypted_message.enc"
+
+5. Finally the program reads the encrypted message and the provided private key and signs the message. This signature is stored in a separate file called "enc_sign.txt".
+If this fails, error messages will be printed out and the program will exit.
+
+Part3
+-----
+Source files: part3.cpp program3utils.cpp program3utils.h desutils.h desutils.cpp 
+Other files: makefile makepart3.sh
+Remaining files mentioned below
+
+To use the part3 program simply run the "sh makepart3.sh" command which should both compile and run the program.
+Alternatively, you can run the "make part3" command and then run the executable that is produced with "./part3 publickey_in_pem_format decrypted_session_key_filename des_encrypted_message_filename signature_filename"
+
+with filenames replaced with the names shown here
+
+1. The use of this program allows the user to provide the program with files for a public key (for signature verfication), a session key file (DES), a des encrypted message, and a signature file.
+
+2. The program checks to see if it can find all files. If not it will output an error message and return.
+
+
+3. The program then reads the session key and decrypts the encrypted message and stores it ina file called "decrypted_message.txt".
+NOTE: The program expects that there is a file present containing the IV called "ivFile.txt".
+
+5. Finally the program reads the signature file and the provided private key and verifies the signature. If the signature is verfied the program will print to console
+"Signature valid". Otherwise it will print "Signature not valid".
+If this fails, error messages will be printed out and the program will exit.
+
+
+-----------
+REFERENCES
+-----------
+OpenSSL Foundation, Inc. “OpenSSL.” /Docs/Manmaster/man3/Index.html, 2018, www.openssl.org/docs/manmaster/man3/.  
+
+Grabbe, J Orlin. “The DES Algorithm Illustrated.” The DES Algorithm Ilustrated, Tu-Berlin, page.math.tu-berlin.de/~kant/teaching/hess/krypto-ws2006/des.htm.
+
+
+Ireland, D. (2017, August 08). Padding schemes for block ciphers. Retrieved April 11, 2018, from https://www.cryptosys.net/pki/manpki/pki_paddingschemes.html

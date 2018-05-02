@@ -8,6 +8,7 @@ int main(int argc, char* argv[]){
   desutils d;
   program3utils p;
 
+// input checking
   if (argc != 5) {
     cerr << "Incorrect argument parameters!" << endl;
     return 1;
@@ -24,21 +25,22 @@ int main(int argc, char* argv[]){
     cout << "File found" << endl;
   }
 
+// end of input checking
+
+// output session key file from encrypted session key file
   p.getSessionKey(argv);
 
-// start of des
+// start of des encrypt (outputs encryption to a file)
   
   char encryptedfileName[1000] = "encrypted_message.enc";
-  char plaintext[1000] = "plaintext.txt";
+//  char plaintext[1000] = "plaintext.txt";
   char sessionkey[1000] = "sessionkey.txt";
   char ivfileName[1000] = "ivFile.txt";
   
   ofstream ivFile;
   ivFile.open("ivFile.txt");
-  //unsigned char ivArray[1000];
-  //vector<string> ptblocks = d.inputFileReader("plaintext.txt");
   
-vector<string> ptblocks = d.inputFileReader(plaintext, 1);
+vector<string> ptblocks = d.inputFileReader(argv[1], 1);
 
 
   bitset<64> ptblocksbin[ptblocks.size()];
@@ -50,7 +52,7 @@ vector<string> ptblocks = d.inputFileReader(plaintext, 1);
   
   string iv = d.keyGenerator(16);
 
-  for(int i = 0; i < 16; i++) ivFile << iv[i];
+  for(int i = 0; i < 16; i++) ivFile << iv[i]; //write iv to a file
 
   bitset<64> keyBin = d.stringToBinary(keyBlocks[0]);
   bitset<64> ivBin = d.hexStringToBinary64(iv);
@@ -58,13 +60,11 @@ vector<string> ptblocks = d.inputFileReader(plaintext, 1);
   std::vector< bitset<48> > keySchedule = d.keyScheduleGenerator(keyBin);
 
   d.des(encryptedfileName, ptblocksbin, 1, ivBin, ptblocks.size(), keySchedule, 0);
+
+// end of des encrypted
   
-  //ptblocks = d.inputFileReader("encrypted_message.enc");
-  
-  
+// start of signing message
   p.signEncryptedMessage(argv[4]);
-  
-//end of des
-  
+// end of signing message  
   
 }
